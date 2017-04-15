@@ -2,10 +2,10 @@
 # Simple script to create tracklet XML files for Didi contest
 # No image output version
 #
-inputDir=/Users/anthonydaniell/Desktop/FilesToSync/Research/Didi_Udacity_Car_Challenge/Round1_Data/Didi-Release-2/Data/Round_1_Test
-outputDir=/Users/anthonydaniell/Desktop/FilesToSync/Research/Didi_Udacity_Car_Challenge/Round1_output/test_1
+inputDir=/tmp_host_share/Round1_Data/Didi-Release-2/Data/1
+outputDir=/tmp_host_share/Round1_output/data_1y
 
-./run-bag_to_kitti.sh -i $inputDir -o $outputDir -- -m
+python /tmp_host_share/CodeBase_official/didi-competition/tracklets/python/bag_to_kitti.py -i $inputDir -o $outputDir -m
 
 #
 # End of script
