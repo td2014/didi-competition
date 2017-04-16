@@ -257,7 +257,7 @@ def main():
     OBSTACLES = ['obs1']
     OBSTACLE_RTK_TOPICS = [OBJECTS_TOPIC_ROOT + '/' + x + '/rear/gps/rtkfix' for x in OBSTACLES]
     filter_topics += OBSTACLE_RTK_TOPICS
-    OBSTACLE_RTK_TOPICS = ['/testTopic']  # for dummy testing xml generator
+    OBSTACLE_RTK_TOPICS = ['/obs1/rear/gps/rtkfix']  # for dummy testing xml generator
 
     bagsets = find_bagsets(indir, filter_topics=filter_topics, set_per_file=True, metadata_filename='metadata.csv')
     if not bagsets:
@@ -315,7 +315,7 @@ def main():
 
             elif topic in CAP_FRONT_RTK_TOPICS:  # dummy up for testing.
                 rtk2dict(msg, cap_front_rtk_dict)
-                testTopic = '/testTopic'
+                testTopic = '/obs1/rear/gps/rtkfix'
                 rtk2dict(msg, obstacle_rtk_dicts[testTopic])
                 stats['msg_count'] += 1
 
