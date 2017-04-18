@@ -64,6 +64,7 @@ class Tracklet(object):
         writeln(f, '<finished>1</finished>', tab_level)
         tab_level -= 1
         writeln(f, '</item>', tab_level)
+        return class_id
 
 
 class TrackletCollection(object):
