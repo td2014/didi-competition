@@ -414,7 +414,19 @@ def main():
                       'Skipping Tracklet generation for %s.' % bs.name)
                 continue
 
+            # Detect estimated obervations if they exist
+            estmFlag=False
+            for obs_topic in obstacle_rtk_dicts.keys():
+               obs_prefix, obs_name = obs_prefix_from_topic(obs_topic)
+               if obs_name[len(obs_name)-2:len(obs_name)]=='_e' :
+                  estmFlag=True
+                  break
+
+
             collection = TrackletCollection()
+            if estmFlag: # create separate collection for estimated positions
+                collection_e = TrackletCollection()           
+
             for obs_topic in obstacle_rtk_dicts.keys():
                 try:
                     obs_rtk_df = obs_rtk_df_dict[obs_topic]
@@ -464,13 +476,25 @@ def main():
                         obs_rear_gps_offset=gps_to_centroid,
                     )
 
-                    collection.tracklets.append(obs_tracklet)
+                    if obs_name[len(obs_name)-2:len(obs_name)]=='_e' : #estimated tracklet
+                        collection_e.tracklets.append(obs_tracklet)
+                    else:
+                        collection.tracklets.append(obs_tracklet)
                 except:
                     pass
                 # end for obs_topic loop
 
-            tracklet_path = os.path.join(dataset_outdir, 'tracklet_labels.xml')
-            collection.write_xml(tracklet_path)
+            if not collection:
+                print('No ground truth tracklets.')
+            else:
+                tracklet_path = os.path.join(dataset_outdir, 'tracklet_labels.xml')
+                collection.write_xml(tracklet_path)
+
+            if estmFlag: # If we have estimated tracklets
+                tracklet_path = os.path.join(dataset_outdir, 'tracklet_labels_e.xml')
+                collection_e.write_xml(tracklet_path)
+
+
         else:
             print('Warning: No camera image times were found. '
                   'Skipping sensor interpolation and Tracklet generation.')
