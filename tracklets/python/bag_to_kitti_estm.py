@@ -148,6 +148,8 @@ def get_obstacle_pos(
         res = rot_z * diff
     else: # we are already in velodyne coordinates
         res = obs_v
+        velodyne_to_front = [0.0, 0.0, 0.0] # no correction needed
+        gps_to_centroid = [0.0, 0.0, 0.0] # no correction needed 
 
     res += list_to_vect(velodyne_to_front)
 
