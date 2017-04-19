@@ -8,7 +8,8 @@
 inputDir=/tmp_host_share/Round1_dataDev
 outputDir=/tmp_host_share/Round1_dataDev_output/
 
-python /tmp_host_share/CodeBase_official/didi-competition/tracklets/python/bag_to_kitti_estm.py -i $inputDir -o $outputDir -m
+###python /tmp_host_share/CodeBase_official/didi-competition/tracklets/python/bag_to_kitti_estm.py -i $inputDir -o $outputDir -m
+python /tmp_host_share/CodeBase_official/didi-competition/tracklets/python/bag_to_kitti_estm.py -i $inputDir -o $outputDir 
 
 #
 # End of script
