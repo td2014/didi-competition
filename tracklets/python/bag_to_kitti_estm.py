@@ -135,12 +135,12 @@ def get_obstacle_pos(
         obstacle,
         velodyne_to_front,
         gps_to_centroid,
-        estmFlag=False):
+        veloFlag=False):
     front_v = dict_to_vect(front)
     rear_v = dict_to_vect(rear)
     obs_v = dict_to_vect(obstacle)
 
-    if not estmFlag: #observer in RTK
+    if not veloFlag: #observer in RTK
         yaw = get_yaw(front_v, rear_v)
         rot_z = kd.Rotation.RotZ(-yaw)
 
@@ -194,6 +194,7 @@ def estimate_obstacle_poses(
     #cap_rear_gps_offset,
     obs_rear_rtk,
     obs_rear_gps_offset,  # offset along [l, w, h] dim of car, in obstacle relative coords
+    veloFlag=False        # If true, we are in velodyne coordinates
 ):
     # offsets are all [l, w, h] lists (or tuples)
     assert(len(obs_rear_gps_offset) == 3)
@@ -203,7 +204,7 @@ def estimate_obstacle_poses(
     velo_to_front = [-1.0922, 0, -0.0508]
     rtk_coords = zip(cap_front_rtk, cap_rear_rtk, obs_rear_rtk)
     output_poses = [
-        get_obstacle_pos(c[0], c[1], c[2], velo_to_front, obs_rear_gps_offset) for c in rtk_coords]
+        get_obstacle_pos(c[0], c[1], c[2], velo_to_front, obs_rear_gps_offset, veloFlag) for c in rtk_coords]
 
     return output_poses
 
@@ -467,18 +468,26 @@ def main():
                     gps_to_centroid = np.subtract(lrg_to_centroid, lrg_to_gps)
 
                 # Convert NED RTK coords of obstacle to capture vehicle body frame relative coordinates
-                    obs_tracklet.poses = estimate_obstacle_poses(
-                        cap_front_rtk=cap_front_rtk_interp_rec,
-                        #cap_front_gps_offset=[0.0, 0.0, 0.0],
-                        cap_rear_rtk=cap_rear_rtk_interp_rec,
-                        #cap_rear_gps_offset=[0.0, 0.0, 0.0],
-                        obs_rear_rtk=obs_interp.to_dict(orient='records'),
-                        obs_rear_gps_offset=gps_to_centroid,
-                    )
-
-                    if obs_name[len(obs_name)-2:len(obs_name)]=='_e' : #estimated tracklet
+                    if obs_name[len(obs_name)-2:len(obs_name)]=='_e' : # estimation in velodyne coordinates
+                        obs_tracklet.poses = estimate_obstacle_poses(
+                            cap_front_rtk=cap_front_rtk_interp_rec,
+                            #cap_front_gps_offset=[0.0, 0.0, 0.0],
+                            cap_rear_rtk=cap_rear_rtk_interp_rec,
+                            #cap_rear_gps_offset=[0.0, 0.0, 0.0],
+                            obs_rear_rtk=obs_interp.to_dict(orient='records'),
+                            obs_rear_gps_offset=gps_to_centroid, 
+                            veloFlag=True
+                        )
                         collection_e.tracklets.append(obs_tracklet)
                     else:
+                        obs_tracklet.poses = estimate_obstacle_poses(
+                            cap_front_rtk=cap_front_rtk_interp_rec,
+                            #cap_front_gps_offset=[0.0, 0.0, 0.0],
+                            cap_rear_rtk=cap_rear_rtk_interp_rec,
+                            #cap_rear_gps_offset=[0.0, 0.0, 0.0],
+                            obs_rear_rtk=obs_interp.to_dict(orient='records'),
+                            obs_rear_gps_offset=gps_to_centroid
+                        )
                         collection.tracklets.append(obs_tracklet)
                 except:
                     pass
@@ -493,7 +502,6 @@ def main():
             if estmFlag: # If we have estimated tracklets
                 tracklet_path = os.path.join(dataset_outdir, 'tracklet_labels_e.xml')
                 collection_e.write_xml(tracklet_path)
-
 
         else:
             print('Warning: No camera image times were found. '
