@@ -258,7 +258,7 @@ def main():
     }]
 
     #FIXME scan from bag info in /obstacles/ topic path.  _e suffix indicates estimated in velodyne coords from processing.
-    OBSTACLES = ['obs1','obs1_e']
+    OBSTACLES = ['obs1','obs1_e', 'obs1_diag']
     OBSTACLE_RTK_TOPICS = [OBJECTS_TOPIC_ROOT + '/' + x + '/rear/gps/rtkfix' for x in OBSTACLES]
     filter_topics += OBSTACLE_RTK_TOPICS
 
